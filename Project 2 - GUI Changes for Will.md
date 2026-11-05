@@ -2,6 +2,8 @@
 
 Hey Will, here's a quick rundown of what changed in the GUI plan since the wireframe we submitted.
 
+Old Wireframe: ![Design Proposal Image](./design-proposal-img.png)
+
 Updated wireframe: https://claude.ai/artifact/3KMq9wSHczg3yvrS1x3kiQ
 
 Updated wireframe image: ![Revised Wireframe](./revised-gui-wireframe.png)
