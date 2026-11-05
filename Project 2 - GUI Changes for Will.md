@@ -4,7 +4,7 @@ Hey Will, here's a quick rundown of what changed in the GUI plan since the wiref
 
 Updated wireframe: https://claude.ai/artifact/3KMq9wSHczg3yvrS1x3kiQ
 
-Updated wireframe image: ![Revised Wireframe](./revised-wireframe.png)
+Updated wireframe image: ![Revised Wireframe](./revised-gui-wireframe.png)
 
 Full GUI details: `Project 2 - GUI Summary.md` in the repo.
 
