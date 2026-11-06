@@ -67,7 +67,7 @@ The command-line program does these steps in one go, in its `measureStructure` f
 
 **Tests to write**
 
-* `makeStructure` gives back an empty structure: `contains` is false for any window before `build` is called.
+* `makeStructure` gives back an empty structure: `bytesUsed` is 0 before `build` is called. (Don't call `contains` on an unbuilt hash table: its table has 0 slots, and h % 0 crashes.)
 * The median of [5, 1, 4, 2, 3] is 3.
 * The median of [7] is 7.
 * The flagged list from Piece 2 matches calling the question checker directly.
