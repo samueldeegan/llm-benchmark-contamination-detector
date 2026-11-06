@@ -11,9 +11,9 @@ Runs the whole program from a terminal with no window, and prints the results as
 | Option | Meaning | Default |
 | ----- | ----- | ----- |
 | `--corpus-cols` | Which corpus columns hold the text, counted from 0 | `1,2` (AG News title and description) |
-| `--corpus-header` | Whether the corpus CSV's first row is a header | `no` (confirm when you open train.csv) |
+| `--corpus-header` | Whether the corpus CSV's first row is a header | `no` (AG News has no header) |
 | `--bench-cols` | Which benchmark columns hold the text | `0` (the MMLU question) |
-| `--bench-header` | Whether the benchmark CSV's first row is a header | `no` |
+| `--bench-header` | Whether the benchmark CSV's first row is a header | `no` (MMLU has no header) |
 | `--plant` | How many questions to plant | `100` |
 | `--seed` | The fixed random seed for planting | `42` |
 | `--runs` | Timing runs per structure (R) | `5` |
@@ -21,7 +21,7 @@ Runs the whole program from a terminal with no window, and prints the results as
 Examples:
 
 ```
-./detector data/train.csv data/mmlu_test.csv
+./detector data/raw/ag_news_csv/train.csv data/raw/mmlu_test.csv
 ./detector data/sample/corpus.csv data/sample/bench.csv --plant 2 --runs 1
 ```
 
@@ -32,25 +32,37 @@ The second runs on the small sample files. `--plant 2` is needed there because t
 | Name | What it is | Who makes it |
 | ----- | ----- | ----- |
 | Arguments | The two file paths plus any options | The person running it |
-| Pipeline output | Corpus array, question lists, answer key, cleaned questions, counts | Pipeline |
-| Results records | One per structure: median build time, median lookup time, bytes used, flagged list | This program, from measurement's pieces |
-| Check report | Planted found, whether the lists agree, unplanted hits | Correctness check |
+| `PipelineSettings` | Columns, header yes/no, plant count, seed | This program, from the arguments |
+| `PipelineOutput` | Corpus array, question lists, answer key, cleaned questions, counts | `runPipeline` |
+| `ResultsRecord` | One per structure: median build time, median lookup time, bytes used, flagged list | This program's `measureStructure`, from measurement's pieces |
+| `CheckReport` | Planted found, whether the lists agree, unplanted hits | `checkCorrectness` |
 
-**Step 1: Read the arguments**
+**Functions in this file**
+
+| Function | Job |
+| ----- | ----- |
+| `parseArgs` | Step 1 |
+| `printUsage` | Prints the usage line and the reason a run failed |
+| `measureStructure` | Steps 3 and 4: measurement's "How the caller uses them" steps for one structure, in one go |
+| `printResults` | Step 6 |
+| `main` | Runs Steps 1 to 7 in order. Catches errors and calls `printUsage`. |
+
+**Step 1: Read the arguments (`parseArgs`)**
 
 * Read the two paths, then any options. Use the defaults for options not given.
-* If a path is missing or a file can't be opened, print a usage line and the reason, then exit with a nonzero code (a number other than 0 tells the terminal the run failed).
+* If a path is missing or an option is wrong, throw an error with a message. `main` catches it, calls `printUsage`, and exits with a nonzero code (a number other than 0 tells the terminal the run failed).
 
 **Step 2: Run the pipeline**
 
-* Run every pipeline step in order: read and clean the benchmark, pick the questions to plant, read and clean the corpus, plant, build the word table and corpus array, and convert the questions to numbers.
+* Call `runPipeline` with the two paths and the settings. It runs every pipeline step in order and gives back the pipeline output.
+* If a file can't be opened, `readCsv` throws an error with a message. `main` catches it the same way as in Step 1.
 * Print a data summary: number of documents, corpus words, questions, questions shorter than 13 words, and questions planted.
-* If fewer questions qualify for planting than `--plant` asks for, print a warning and plant all that qualify.
+* If fewer questions qualify for planting than `--plant` asks for, print a warning. The pipeline plants all that qualify.
 
-**Step 3: Measure the hash table**
+**Step 3: Measure the hash table (`measureStructure`)**
 
-* Follow measurement's "How the caller uses them" steps 1 to 6, with R runs. This gives the hash table's results record.
-* Step 6 there lets the hash table be destroyed before the next step, so both structures are never in memory at once.
+* Follow measurement's "How the caller uses them" steps 1 to 6, with R runs. For each timed build, get a new, empty hash table from `makeStructure` first. This gives the hash table's `ResultsRecord`.
+* Step 6 there drops the hash table before the next step, so both structures are never in memory at once.
 
 **Step 4: Measure the suffix array**
 
@@ -58,9 +70,9 @@ The second runs on the small sample files. `--plant 2` is needed there because t
 
 **Step 5: Run the correctness check**
 
-* Call it with both flagged lists, the answer key, the question count, and the cleaned questions.
+* Call `checkCorrectness` with both flagged lists, the answer key, the question count, and the cleaned questions.
 
-**Step 6: Print the results**
+**Step 6: Print the results (`printResults`)**
 
 ```
 Data
