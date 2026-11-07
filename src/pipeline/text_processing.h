@@ -1,6 +1,8 @@
+#pragma once
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <cctype>
 
 std::string cleanText(const std::string& text);
 std::vector<std::string>splitWords(const std::string& text);
