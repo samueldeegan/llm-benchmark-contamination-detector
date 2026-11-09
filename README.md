@@ -2,7 +2,7 @@
 
 COP 3530 Project 2. Samuel Deegan ([samueldeegan](https://github.com/samueldeegan)). Individual submission.
 
-Video demo: [link]
+Video demo: https://youtu.be/rsBqola8Nkc
 
 This program checks whether questions from a benchmark (MMLU) appear word for word in a training corpus (AG News). A question is flagged if any 13-word stretch of it, after cleanup, appears anywhere in the corpus.
 
